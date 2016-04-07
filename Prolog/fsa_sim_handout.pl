@@ -46,7 +46,8 @@
 %%%   State_Struct the state structure from States with name Name
 
 % define state_struct here
-	state_struct(Name, [SH|ST], S) :- .
+	state_struct(Name,States,State_struct) :- State_struct is States(state(Name, _,_)).
+	
 %%% next_state_name(+State_struct, +Characters, -Next_name, -Next_chars)
 %%% [version 2 - next line fixed]
 %%% find (the name of) a next state to transition to 
@@ -54,23 +55,27 @@
 %%%   Characters is the list of characters currently left in the input,
 %%%   Next_name is the name of the next state, and Next_chars is the
 %%%     remaining list of input chars
-
+	
 % define next_state_name here
+	next_state_name(state_struct(N,[S1|ST],State_struct), [C1|CT], NN, NC) :- 
 
 % accepts(+State_struct, +Fsa, +Chars) true if Fsa accepts character
 % string Chars when starting from the state represented by State_struct
 
 % define accepts here
-%Variables : N - name, TL - Transition List, A - allowed, 
-%S - state tail, FC - First Char, TC - Tail Chars
-accepts([N,TL,A], [S|ST], [FC|TC]) :- .
+	accepts(S,[State1|States],[ ]):-accepted(S). 
+	accepts(S,[State1|States],[C1|CT]) :- N is state_struct(next_state_name(S,[C1|CT],NN,CT)),[State1|States],[CT]),
+										  accepts(N,[State1|States],[CT]).
+	
+	
+	accepted(state(_,_,yes)).
 %%% run(Fsa, Chars) Fsa is a list of state stuctures representing
 %%% a Fsa (so that the first state in the list is the start state of
 %%% the fsa), Chars is a list of symbols and numbers representing
 %%% the input to the fsa.  run succeeds if and only if the fsa
 %%% would accept the sequence of characters
 
-run([State1 | States], Chars):- accepts(State1,[State1 | States], Chars).
+run([State1 | States], Chars):- accepts(State1,[State1|States], Chars).
 
 % demo1 and demo2 demonstrate calls to run.  They each specify a
 % automaton and allow you to run that automaton with different input
