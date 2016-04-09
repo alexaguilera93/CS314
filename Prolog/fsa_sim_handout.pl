@@ -46,7 +46,7 @@
 %%%   State_Struct the state structure from States with name Name
 
 % define state_struct here
-	state_struct(Name,States,State_struct) :- State_struct is States(state(Name, _,_)).
+state_struct(Name,States,state(Name,T,C)) :- member(state(Name,T,C),States).
 	
 %%% next_state_name(+State_struct, +Characters, -Next_name, -Next_chars)
 %%% [version 2 - next line fixed]
@@ -57,18 +57,22 @@
 %%%     remaining list of input chars
 	
 % define next_state_name here
-	next_state_name(state_struct(N,[S1|ST],State_struct), [C1|CT], NN, NC) :- 
+next_state_name(state(_,Tr,_),[C1|CT],NN,CT) :-	member(transition(C1,NN), Tr). 
 
 % accepts(+State_struct, +Fsa, +Chars) true if Fsa accepts character
 % string Chars when starting from the state represented by State_struct
 
 % define accepts here
-	accepts(S,[State1|States],[ ]):-accepted(S). 
-	accepts(S,[State1|States],[C1|CT]) :- N is state_struct(next_state_name(S,[C1|CT],NN,CT)),[State1|States],[CT]),
-										  accepts(N,[State1|States],[CT]).
+accepts(State1,_,[]) :- accepted(State1). 
+accepts(State1,[State1|States],[C1|CT]) :- next_state_name(State1,[C1|CT],NN,CT),
+										   state_struct(NN,States,NS),
+										   accepts(NS,[State1|States],CT).
+accepts(State,States,[C1|CT]) :- next_state_name(State,[C1|CT],NN,CT),
+								 state_struct(NN,States,NS),
+								 accepts(NS,States,CT).
 	
 	
-	accepted(state(_,_,yes)).
+accepted(state(_,_,yes)).
 %%% run(Fsa, Chars) Fsa is a list of state stuctures representing
 %%% a Fsa (so that the first state in the list is the start state of
 %%% the fsa), Chars is a list of symbols and numbers representing
