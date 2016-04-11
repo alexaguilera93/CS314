@@ -64,9 +64,9 @@ next_state_name(state(_,Tr,_),[C1|CT],NN,CT) :-	member(transition(C1,NN), Tr).
 
 % define accepts here
 accepts(State1,_,[]) :- accepted(State1). 
-accepts(State1,[State1|States],[C1|CT]) :- next_state_name(State1,[C1|CT],NN,CT),
-										   state_struct(NN,States,NS),
-										   accepts(NS,[State1|States],CT).
+%accepts(State1,[State1|States],[C1|CT]) :- next_state_name(State1,[C1|CT],NN,CT),
+%										   state_struct(NN,States,NS),
+%										   accepts(NS,[State1|States],CT).
 accepts(State,States,[C1|CT]) :- next_state_name(State,[C1|CT],NN,CT),
 								 state_struct(NN,States,NS),
 								 accepts(NS,States,CT).
